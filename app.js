@@ -1,78 +1,49 @@
 require("dotenv").config();
 const express = require("express");
-const cors =require("cors")
+const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
 const authMiddleware = require("./middleware/authMiddleware");
 
-
-/************************************************************************************** */
-/******************************db connection*********************************************/
-/************************************************************************************** */
-
+// Database connection
 const dbconnection = require("./db/dbConfig");
-app.use(cors())
+app.use(cors());
 
-/************************************************************************************** */
-/*************************Route middleware for creating tables***************************/
-/************************************************************************************** */
-
+// Route middleware for creating tables
 const createTablesRoute = require("./db/create-Tables");
 app.use("/install", createTablesRoute);
 
-
-/************************************************************************************** */
-/*************************user routes middleware file***********************************/
-/************************************************************************************** */
-
+// User routes middleware file
 const userRoutes = require("./routes/userRoutes");
 
-//user middleware to extract json data
+// Middleware to extract JSON data
 app.use(express.json());
 
-
-/************************************************************************************** */
-/*************************user routes middleware****************************************/
-/************************************************************************************** */
-
+// User routes middleware
 app.use("/api/user", userRoutes);
 
 async function start() {
   try {
-    const result = await dbconnection.execute("select'test'");
-    await app.listen(port);
-    console.log(result);
-    console.log(`listing to ${port}`);
+    const result = await dbconnection.execute("select 'test'");
+    app.listen(port, "0.0.0.0", () => {
+      // Explicitly bind to 0.0.0.0
+      console.log(result);
+      console.log(`Server is listening on port ${port}`);
+    });
   } catch (error) {
     console.log(error.message);
   }
 }
 start();
 
-/************************************************************************************** */
-/************************question routes middleware file*********************************/
-/************************************************************************************** */
-
-
+// Question routes middleware file
 const questionRoutes = require("./routes/questionRoutes");
 
-/************************************************************************************** */
-/************************question routes middleware*************************************/
-/************************************************************************************** */
-
-
+// Question routes middleware
 app.use("/api/question", authMiddleware, questionRoutes);
 
-
-/************************************************************************************** */
-/************************answer routes middleware file*********************************/
-/************************************************************************************** */
-
+// Answer routes middleware file
 const answerRoutes = require("./routes/answerRoute");
 
-
-/************************************************************************************** */
-/************************Answer routes middleware*********************************/
-/************************************************************************************** */
-
+// Answer routes middleware
 app.use("/api/answer", authMiddleware, answerRoutes);
