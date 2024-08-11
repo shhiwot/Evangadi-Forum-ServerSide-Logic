@@ -1,11 +1,11 @@
-require("dotenv").config();
+require("dotenv").config(); // Ensure environment variables are loaded
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5000; // Default to 5000 if PORT is not set
 const authMiddleware = require("./middleware/authMiddleware");
 
-// Database connection
+// Database connection (imported from separate file)
 const dbconnection = require("./db/dbConfig");
 app.use(cors());
 
@@ -16,7 +16,7 @@ app.use("/install", createTablesRoute);
 // User routes middleware file
 const userRoutes = require("./routes/userRoutes");
 
-// Middleware to extract JSON data
+// Middleware to parse JSON data
 app.use(express.json());
 
 // User routes middleware
@@ -24,26 +24,23 @@ app.use("/api/user", userRoutes);
 
 async function start() {
   try {
-    const result = await dbconnection.execute("select 'test'");
+    // Test database connection
+    const [result] = await dbconnection.execute("SELECT 'test'");
+    // Start the server and bind to 0.0.0.0
     app.listen(port, "0.0.0.0", () => {
-      // Explicitly bind to 0.0.0.0
       console.log(result);
       console.log(`Server is listening on port ${port}`);
     });
   } catch (error) {
-    console.log(error.message);
+    console.error("Error starting the server:", error.message);
   }
 }
 start();
 
 // Question routes middleware file
 const questionRoutes = require("./routes/questionRoutes");
-
-// Question routes middleware
 app.use("/api/question", authMiddleware, questionRoutes);
 
 // Answer routes middleware file
 const answerRoutes = require("./routes/answerRoute");
-
-// Answer routes middleware
 app.use("/api/answer", authMiddleware, answerRoutes);
