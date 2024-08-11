@@ -2,16 +2,13 @@ require("dotenv").config(); // Ensure environment variables are loaded
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 5000; // Default to 5000 if PORT is not set
+const port = process.env.Port || 5432; // Default to 5000 if PORT is not set
 const authMiddleware = require("./middleware/authMiddleware");
 
 // Database connection (imported from separate file)
 const dbconnection = require("./db/dbConfig");
 app.use(cors());
 
-// Route middleware for creating tables
-const createTablesRoute = require("./db/create-Tables");
-app.use("/install", createTablesRoute);
 
 // User routes middleware file
 const userRoutes = require("./routes/userRoutes");
